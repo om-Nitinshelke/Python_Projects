@@ -2,10 +2,10 @@ import speech_recognition as sr
 import pyttsx3 as ts
 import webbrowser
 from datetime import datetime
+import wikipedia
 
 r = sr.Recognizer()
-r.pause_threshold=0.8
-
+r.pause_threshold=1.5
 
 
 def speak(t):
@@ -14,6 +14,22 @@ def speak(t):
     engine.say(t)
     engine.runAndWait()
     engine.stop()
+
+def wiki(query):
+    try:
+        info = wikipedia.summary(query, sentences=5)
+        print(info)
+        speak(info)
+
+    except wikipedia.exceptions.DisambiguationError as e:
+        speak("Your query has multiple meanings. Please be more specific.")
+
+    except wikipedia.exceptions.PageError:
+        speak("Sorry, I couldn't find anything on that topic.")
+
+    except Exception as e:
+        print(e)
+        speak("Something went wrong while searching Wikipedia.")
 
 current_hour =datetime.now().hour
 
@@ -53,6 +69,13 @@ with sr.Microphone() as source:
                 if "open chatgpt" in text:
                     webbrowser.open_new("https://chatgpt.com/")
                     continue
+
+                if "search" in text:
+                    speak("Tell me what to search on Wikipedia")
+                    audio2 = r.listen(source, phrase_time_limit=5)
+                    title = r.recognize_google(audio2).lower()
+                    wiki(title)
+
 
                 if "exit now" in text:
                     speak("Thanks for using me")
