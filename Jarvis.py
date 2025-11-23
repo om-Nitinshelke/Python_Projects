@@ -22,14 +22,35 @@ def wiki(query):
         speak(info)
 
     except wikipedia.exceptions.DisambiguationError as e:
+        print("Your query has multiple meanings. Please be more specific.")
         speak("Your query has multiple meanings. Please be more specific.")
 
     except wikipedia.exceptions.PageError:
+        print("Sorry, I couldn't find anything on that topic.")
         speak("Sorry, I couldn't find anything on that topic.")
+
+    except wikipedia.exceptions.HTTPTimeoutError:
+        print("Internet issue. Try again later")
+        speak("Internet issue. Try again later")
 
     except Exception as e:
         print(e)
         speak("Something went wrong while searching Wikipedia.")
+
+    print("Do you want to search something else now")
+    speak("Do you want to search something else now")
+    audio3 = r.listen(source, phrase_time_limit=5)
+    message = r.recognize_google(audio3).lower()
+    if "search" in message:
+        print("Tell me the next title for searching")
+        speak("Tell me the next title for searching")
+        audio4 = r.listen(source, phrase_time_limit=5)
+        message1 = r.recognize_google(audio4).lower()
+        wiki(message1)
+    if "do not" in message:
+        print("Tell me something more I can do for you")
+        speak("Tell me something more I can do for you")
+
 
 current_hour =datetime.now().hour
 
