@@ -3,6 +3,8 @@ import pyttsx3 as ts
 import webbrowser
 from datetime import datetime
 import wikipedia
+import random
+
 
 r = sr.Recognizer()
 r.pause_threshold=1.5
@@ -37,8 +39,8 @@ def wiki(query):
         print(e)
         speak("Something went wrong while searching Wikipedia.")
 
-    print("Do you want to search something else now")
-    speak("Do you want to search something else now")
+    print("Do you want to search something else now If not you can say no")
+    speak("Do you want to search something else now If not you can say no")
     audio3 = r.listen(source, phrase_time_limit=5)
     message = r.recognize_google(audio3).lower()
     if "search" in message:
@@ -47,9 +49,53 @@ def wiki(query):
         audio4 = r.listen(source, phrase_time_limit=5)
         message1 = r.recognize_google(audio4).lower()
         wiki(message1)
-    if "do not" in message:
+    if "no" in message:
         print("Tell me something more I can do for you")
         speak("Tell me something more I can do for you")
+
+def game():
+    print("I will ask you about your choice so choose between rock,paper and scissors and if you want to stop the game you can say stop the game")
+    speak("I will ask you about your choice so choose between rock,paper and scissors and if you want to stop the game you can say stop the game")
+    while True:
+        print("Your choice:")
+        speak("Your choice")
+        choose=r.listen(source,phrase_time_limit=5)
+        user=r.recognize_google(choose).lower()
+        jarvis=random.choice(["rock","paper","scissor"])
+        print("Your choice is:" + user)
+        speak("Your choice is:"+user)
+        if "stop" in user:
+            print("Exiting the game")
+            speak("Exiting the game")
+            break
+        print("My choice is:"+jarvis)
+        speak("My choice is:"+jarvis)
+
+        if user==jarvis:
+            print("This round is a draw")
+            speak("This round is a draw")
+            continue
+        elif "rock" in user and "paper" in jarvis:
+            print("You lose")
+            speak("You lose")
+            continue
+        elif "paper" in user and "scissor" in jarvis:
+            print("You lose")
+            speak("You lose")
+            continue
+        elif "scissor" in user and "rock" in jarvis:
+            print("You lose")
+            speak("You lose")
+            continue
+        else:
+            print("You Win")
+            speak("You Win")
+            continue
+
+    print("thanks for playing")
+    speak("thanks for playing")
+
+
 
 
 current_hour =datetime.now().hour
@@ -97,9 +143,12 @@ with sr.Microphone() as source:
                     title = r.recognize_google(audio2).lower()
                     wiki(title)
 
+                if "play" in text:
+                    print("Sure let's play rock paper and scissors game")
+                    game()
+
 
                 if "exit now" in text:
-                    speak("Thanks for using me")
                     break
 
             except sr.UnknownValueError:
@@ -107,3 +156,6 @@ with sr.Microphone() as source:
             except sr.WaitTimeoutError:
                 pass
 
+
+
+speak("Thanks for using me")
