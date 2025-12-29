@@ -111,7 +111,6 @@ else:
 
 with sr.Microphone() as source:
         r.adjust_for_ambient_noise(source,duration=1)
-
         while True:
             print("Talk")
             print("Say Something")
@@ -120,6 +119,16 @@ with sr.Microphone() as source:
                 text = r.recognize_google(audio).lower()
                 print("You said:", text)
                 speak("You said: " + text)
+
+                if "send" in text:
+                    print("Which file do you want to send")
+                    speak("Which file do you want to send")
+
+                    audioforFile=r.listen(source,phrase_time_limit=5)
+                    textforFile=r.recognize_google(audioforFile).lower()
+                    print("You said:",textforFile)
+                    speak("You said:"+textforFile)
+                    continue
 
                 if "open geeks for geeks" in text:
                     webbrowser.open("https://www.geeksforgeeks.org")
