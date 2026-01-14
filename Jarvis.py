@@ -4,11 +4,22 @@ import webbrowser
 from datetime import datetime
 import wikipedia
 import random
+import os
 
 
 r = sr.Recognizer()
 r.pause_threshold=1.5
 
+
+
+def search_file(file_name,path):
+    for root,directory,files in os.walk(path):
+        if file_name in files:
+            print("File is present")
+            return os.path.join(root,file_name)
+
+    print("File is not present")
+    return None
 
 def speak(t):
     engine=ts.init()
@@ -123,11 +134,16 @@ with sr.Microphone() as source:
                 if "send" in text:
                     print("Which file do you want to send")
                     speak("Which file do you want to send")
-
-                    audioforFile=r.listen(source,phrase_time_limit=5)
-                    textforFile=r.recognize_google(audioforFile).lower()
-                    print("You said:",textforFile)
-                    speak("You said:"+textforFile)
+                    audio_for_File=r.listen(source,phrase_time_limit=5)
+                    text_for_File=r.recognize_google(audio_for_File).lower()
+                    print("You said:",text_for_File)
+                    speak("You said:"+text_for_File)
+                    details=text_for_File.split()
+                    speak("Enter the email id of person whom you want to send this file")
+                    Receiver=input("Enter the email id:")
+                    print("File Name:",details[-1],"To:",Receiver)
+                    file_path=search_file(details[-1],r"C:\Users\omshelke\Desktop\Om Shelke")
+                    print(file_path)
                     continue
 
                 if "open geeks for geeks" in text:
