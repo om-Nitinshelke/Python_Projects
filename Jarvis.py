@@ -7,10 +7,22 @@ import random
 import os
 import time
 from speech_recognition import UnknownValueError
+import smtplib
 
 
 r = sr.Recognizer()
 r.pause_threshold = 1.5
+
+sender="shelkeom67@gmail.com"
+password="hpqn xpib wkwj oixa"
+
+def send_email(receiver,m):
+    server=smtplib.SMTP("smtp.gmail.com",587)
+    server.starttls()
+    server.login(sender,password)
+    server.sendmail(sender,receiver,m)
+    server.quit()
+    print("Your email is sent successfully")
 
 
 def speak(t):
@@ -110,7 +122,7 @@ with sr.Microphone() as source:
             if "geeks for geeks" in text:
                 speak("Opening Geeks for Geeks")
                 webbrowser.open("https://www.geeksforgeeks.org")
-                time.sleep(2)  # FIX 3
+                time.sleep(2)
                 continue
 
             if "youtube" in text:
@@ -136,6 +148,14 @@ with sr.Microphone() as source:
                 query = take_command(source)
                 if query:
                     wiki(query)
+
+            if "email" in text:
+                speak("what is the email ID of the person you want to send the email to?")
+                destination=input("Email ID:")
+                speak("give me the message:")
+                message=take_command(source)
+                send_email(destination,message)
+
 
             if "play" in text:
                 game()
