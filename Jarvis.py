@@ -8,13 +8,13 @@ import os
 import time
 from speech_recognition import UnknownValueError
 import smtplib
+from secret import sender,password
 
 
 r = sr.Recognizer()
 r.pause_threshold = 1.5
 
-sender="shelkeom67@gmail.com"
-password="hpqn xpib wkwj oixa"
+
 
 def send_email(receiver,m):
     server=smtplib.SMTP("smtp.gmail.com",587)
