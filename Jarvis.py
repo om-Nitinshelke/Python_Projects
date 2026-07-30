@@ -70,7 +70,8 @@ def wiki(query):
 
 def game():
     speak("Choose between rock paper or scissor. Say stop game to exit")
-
+    user_points=0
+    jarvis_points=0
     while True:
         user = take_command(source)
         if not user:
@@ -88,8 +89,20 @@ def game():
              ("paper" in user and jarvis == "scissor") or \
              ("scissor" in user and jarvis == "rock"):
             speak("You lose")
+            jarvis_points+=1
         else:
             speak("You win")
+            user_points+=1
+    print("You're score is:",user_points)
+    print("My score is:",jarvis_points)
+
+    if user_points > jarvis_points:
+        speak("Congratulation you have won")
+    elif user_points < jarvis_points:
+        speak("I won")
+    else:
+        speak("This match is draw")
+
 
     speak("Thanks for playing")
 
