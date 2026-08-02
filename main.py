@@ -8,7 +8,6 @@ import os
 import time
 from speech_recognition import UnknownValueError
 import smtplib
-from secret import sender,password
 from email.message import EmailMessage
 import mimetypes
 
@@ -16,15 +15,30 @@ import mimetypes
 r = sr.Recognizer()
 r.pause_threshold = 1.5
 
+sender = os.getenv("JARVIS_EMAIL_SENDER")
+password = os.getenv("JARVIS_EMAIL_APP_PASSWORD")
 
+def send_email(receiver, message):
+    if not sender or not password:
+        raise ValueError("Email credentials are missing from environment variables")
 
-def send_email(receiver,m):
-    server=smtplib.SMTP("smtp.gmail.com",587)
-    server.starttls()
-    server.login(sender,password)
-    server.sendmail(sender,receiver,m)
-    server.quit()
-    print("Your email is sent successfully")
+    msg = EmailMessage()
+    msg["Subject"] = "Message from Jarvis"
+    msg["From"] = sender
+    msg["To"] = receiver
+    msg.set_content(message)
+
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            smtp.login(sender, password)
+            smtp.send_message(msg)
+
+        speak("Your email is sent successfully")
+        return True
+
+    except Exception as e:
+        print("Email sending error:", e)
+        return False
 
 
 def speak(t):
@@ -163,7 +177,7 @@ with sr.Microphone() as source:
                 continue
 
 
-            if "send" in text:
+            if "file" in text:
                 speak("Tell me the name of your file you want to send")
                 file_name=take_command(source).lower()
                 speak("Can you give me the email of the receiver")
@@ -194,10 +208,21 @@ with sr.Microphone() as source:
 
             if "email" in text:
                 speak("what is the email ID of the person you want to send the email to?")
-                destination=input("Email ID:")
+                destination = input("Email ID:").strip()
+
                 speak("give me the message:")
-                message=take_command(source)
-                send_email(destination,message)
+                message = take_command(source)
+
+                if not message:
+                    speak("I could not hear the message")
+                    continue
+
+                result = send_email(destination, message)
+
+                if result:
+                    speak("Your email is sent successfully")
+                else:
+                    speak("Some error occurred while sending the email")
 
 
             if "play" in text:
