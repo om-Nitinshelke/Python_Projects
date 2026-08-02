@@ -3,7 +3,7 @@ import pyttsx3 as ts
 import webbrowser
 from datetime import datetime
 import wikipedia
-import random
+from game import play_game
 import os
 import time
 from speech_recognition import UnknownValueError
@@ -42,7 +42,9 @@ def take_command(source):
     except UnknownValueError:
         return ""
 
-def find_and_send_file_via_gmail(search_path, file_name, gmail_sender, gmail_app_password, gmail_receiver):
+def find_and_send_file_via_gmail(search_path, file_name, gmail_sender,
+                                 gmail_app_password,
+                                 gmail_receiver):
     found_file = None
     file_name = file_name.lower().strip()
 
@@ -115,44 +117,6 @@ def wiki(query):
     except Exception as e:
         print(e)
         speak("Something went wrong while searching Wikipedia.")
-
-def game():
-    speak("Choose between rock paper or scissor. Say stop game to exit")
-    user_points=0
-    jarvis_points=0
-    while True:
-        user = take_command(source)
-        if not user:
-            continue
-
-        jarvis = random.choice(["rock", "paper", "scissor"])
-
-        if "stop" in user:
-            speak("Exiting the game")
-            break
-
-        if user == jarvis:
-            speak("This round is a draw")
-        elif ("rock" in user and jarvis == "paper") or \
-             ("paper" in user and jarvis == "scissor") or \
-             ("scissor" in user and jarvis == "rock"):
-            speak("You lose")
-            jarvis_points+=1
-        else:
-            speak("You win")
-            user_points+=1
-    print("You're score is:",user_points)
-    print("My score is:",jarvis_points)
-
-    if user_points > jarvis_points:
-        speak("Congratulation you have won")
-    elif user_points < jarvis_points:
-        speak("I won")
-    else:
-        speak("This match is draw")
-
-
-    speak("Thanks for playing")
 
 
 current_hour = datetime.now().hour
@@ -237,7 +201,7 @@ with sr.Microphone() as source:
 
 
             if "play" in text:
-                game()
+                play_game(source,take_command,speak)
 
         except sr.UnknownValueError:
             pass

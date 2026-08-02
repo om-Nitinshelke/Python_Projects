@@ -1,40 +1,50 @@
 import random
 
-def game():
-    print("Welcome to rock ,paper and scissor game")
-    print()
-    print("Enter 1 if you want to play and enter 0 in the choice if you want to quit")
-    print()
-    n=int(input("Enter:"))
-    if n==1:
-        print("Let's start the game")
-    while True:
-        user_choice=input("Enter your choice (rock/paper/scissor):")
-        computer=random.choice(["rock","paper","scissor"])
-        print()
-        print("You're choice",user_choice)
-        print()
-        print("Computer's choice",computer)
-        if user_choice==computer:
-            print("Tie")
-            continue
-        elif user_choice=="rock" and computer=="scissor":
-            print("You win")
-            continue
-        elif user_choice=="scissor" and computer=="paper":
-            print("You win")
-            continue
-        elif user_choice=="paper" and computer=="rock":
-            print("You win")
-            continue
-        elif user_choice=="0":
-            break
-        else:
-            print("You lose")
-            print("Sorry")
-    print()
-    print("Thanks for playing")
 
-game()
+def play_game(source, take_command, speak):
+    speak("Choose between rock paper or scissor. Say stop game to exit")
+
+    user_points = 0
+    jarvis_points = 0
+
+    while True:
+        user = take_command(source)
+
+        if not user:
+            continue
+
+        jarvis = random.choice(["rock", "paper", "scissor"])
+
+        if "stop" in user:
+            speak("Exiting the game")
+            break
+
+        if user == jarvis:
+            speak("This round is a draw")
+
+        elif ("rock" in user and jarvis == "paper") or \
+             ("paper" in user and jarvis == "scissor") or \
+             ("scissor" in user and jarvis == "rock"):
+            speak("You lose")
+            jarvis_points += 1
+
+        elif "rock" in user or "paper" in user or "scissor" in user:
+            speak("You win")
+            user_points += 1
+
+        else:
+            speak("Please choose rock, paper, or scissor")
+
+    print("Your score is:", user_points)
+    print("My score is:", jarvis_points)
+
+    if user_points > jarvis_points:
+        speak("Congratulations, you have won")
+    elif user_points < jarvis_points:
+        speak("I won")
+    else:
+        speak("This match is draw")
+
+    speak("Thanks for playing")
 
 
