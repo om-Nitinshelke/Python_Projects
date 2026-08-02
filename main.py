@@ -32,8 +32,6 @@ def send_email(receiver, message):
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
             smtp.login(sender, password)
             smtp.send_message(msg)
-
-        speak("Your email is sent successfully")
         return True
 
     except Exception as e:
