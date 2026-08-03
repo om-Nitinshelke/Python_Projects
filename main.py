@@ -2,7 +2,7 @@ import speech_recognition as sr
 import pyttsx3 as ts
 import webbrowser
 from datetime import datetime
-import wikipedia
+import requests
 from game import play_game
 import os
 import time
@@ -114,21 +114,76 @@ def find_and_send_file_via_gmail(search_path, file_name, gmail_sender,
 
 def wiki(query):
     try:
-        info = wikipedia.summary(query, sentences=5)
+        if not query:
+            speak("I did not hear what to search.")
+            return
+
+        query = query.lower().strip()
+        query = query.replace("search about", "")
+        query = query.replace("search", "")
+        query = query.replace("about", "")
+        query = query.strip()
+
+        print("Searching Wikipedia for:", query)
+
+        url = "https://en.wikipedia.org/w/api.php"
+
+        search_params = {
+            "action": "query",
+            "list": "search",
+            "srsearch": query,
+            "format": "json"
+        }
+
+        headers = {
+            "User-Agent": "JarvisAssistant/1.0"
+        }
+
+        search_response = requests.get(url, params=search_params, headers=headers, timeout=10)
+        search_response.raise_for_status()
+        search_data = search_response.json()
+
+        results = search_data["query"]["search"]
+
+        if not results:
+            speak("Sorry, I could not find anything on that topic.")
+            return
+
+        title = results[0]["title"]
+        print("Best Wikipedia result:", title)
+
+        summary_params = {
+            "action": "query",
+            "prop": "extracts",
+            "exintro": True,
+            "explaintext": True,
+            "titles": title,
+            "format": "json"
+        }
+
+        summary_response = requests.get(url, params=summary_params, headers=headers, timeout=10)
+        summary_response.raise_for_status()
+        summary_data = summary_response.json()
+
+        pages = summary_data["query"]["pages"]
+        page = next(iter(pages.values()))
+        info = page.get("extract", "")
+
+        if not info:
+            speak("Sorry, I could not get the summary.")
+            return
+
+        info = ". ".join(info.split(". ")[:5])
         print(info)
         speak(info)
 
-    except wikipedia.exceptions.DisambiguationError:
-        speak("Your query has multiple meanings. Please be more specific.")
-
-    except wikipedia.exceptions.PageError:
-        speak("Sorry, I couldn't find anything on that topic.")
-
-    except wikipedia.exceptions.HTTPTimeoutError:
-        speak("Internet issue. Try again later")
+    except requests.exceptions.RequestException as e:
+        print("Wikipedia network error:", e)
+        speak("Internet issue. Try again later.")
 
     except Exception as e:
-        print(e)
+        print("Wikipedia error type:", type(e).__name__)
+        print("Wikipedia error:", e)
         speak("Something went wrong while searching Wikipedia.")
 
 
