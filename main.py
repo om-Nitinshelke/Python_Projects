@@ -18,9 +18,10 @@ r.pause_threshold = 1.5
 sender = os.getenv("JARVIS_EMAIL_SENDER")
 password = os.getenv("JARVIS_EMAIL_APP_PASSWORD")
 
+if not sender or not password:
+    raise ValueError("Email credentials are missing from environment variables")
+
 def send_email(receiver, message):
-    if not sender or not password:
-        raise ValueError("Email credentials are missing from environment variables")
 
     msg = EmailMessage()
     msg["Subject"] = "Message from Jarvis"
@@ -153,29 +154,29 @@ with sr.Microphone() as source:
             if not text:
                 continue
 
-            if "exit now" in text:
+            elif "exit now" in text:
                 break
 
-            if "geeks for geeks" in text:
+            elif "geeks for geeks" in text:
                 speak("Opening Geeks for Geeks")
                 webbrowser.open("https://www.geeksforgeeks.org")
                 time.sleep(2)
                 continue
 
-            if "youtube" in text:
+            elif "youtube" in text:
                 speak("Opening YouTube")
                 webbrowser.open("https://www.youtube.com")
                 time.sleep(2)
                 continue
 
-            if "github" in text:
+            elif "github" in text:
                 speak("Opening GitHub")
                 webbrowser.open("https://github.com")
                 time.sleep(2)
                 continue
 
 
-            if "file" in text:
+            elif "file" in text:
                 speak("Tell me the name of your file you want to send")
                 file_name=take_command(source).lower()
                 speak("Can you give me the email of the receiver")
@@ -192,19 +193,19 @@ with sr.Microphone() as source:
                     speak("Some error comes during file sending")
 
 
-            if "chatgpt" in text:
+            elif "chatgpt" in text:
                 speak("Opening ChatGPT")
                 webbrowser.open("https://chatgpt.com")
                 time.sleep(2)
                 continue
 
-            if "search" in text:
+            elif "search" in text:
                 speak("Tell me what you want to search on Wikipedia")
                 query = take_command(source)
                 if query:
                     wiki(query)
 
-            if "email" in text:
+            elif "email" in text:
                 speak("what is the email ID of the person you want to send the email to?")
                 destination = input("Email ID:").strip()
 
@@ -223,7 +224,7 @@ with sr.Microphone() as source:
                     speak("Some error occurred while sending the email")
 
 
-            if "play" in text:
+            elif "play" in text:
                 play_game(source,take_command,speak)
 
         except sr.UnknownValueError:
