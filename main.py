@@ -47,9 +47,9 @@ def speak(t):
     engine.runAndWait()
     engine.stop()
 
-def take_command(source):
+def take_command(s):
     try:
-        audio_for_task = r.listen(source, phrase_time_limit=7)
+        audio_for_task = r.listen(s, phrase_time_limit=7)
         text_for_task = r.recognize_google(audio_for_task).lower()
         return text_for_task
     except UnknownValueError:
@@ -59,7 +59,7 @@ def find_and_send_file_via_gmail(search_path, file_name, gmail_sender,
                                  gmail_app_password,
                                  gmail_receiver):
     found_file = None
-    file_name = file_name.lower().strip()
+    file = file_name.lower().strip()
 
     for root, dirs, files in os.walk(search_path):
         for actual_file in files:
@@ -68,7 +68,7 @@ def find_and_send_file_via_gmail(search_path, file_name, gmail_sender,
             # Match full name OR name without extension
             actual_name_without_ext = os.path.splitext(actual_file_lower)[0]
 
-            if actual_file_lower == file_name or actual_name_without_ext == file_name:
+            if actual_file_lower == file or actual_name_without_ext == file:
                 found_file = os.path.join(root, actual_file)
                 break
 
@@ -118,20 +118,21 @@ def wiki(query):
             speak("I did not hear what to search.")
             return
 
-        query = query.lower().strip()
-        query = query.replace("search about", "")
-        query = query.replace("search", "")
-        query = query.replace("about", "")
-        query = query.strip()
+        q = query.lower().strip()
 
-        print("Searching Wikipedia for:", query)
+        for word in ("search about", "search", "about"):
+            q = q.replace(word, "")
+
+        q = q.strip()
+
+        print("Searching Wikipedia for:", q)
 
         url = "https://en.wikipedia.org/w/api.php"
 
         search_params = {
             "action": "query",
             "list": "search",
-            "srsearch": query,
+            "srsearch": q,
             "format": "json"
         }
 
@@ -233,10 +234,10 @@ with sr.Microphone() as source:
 
             elif "file" in text:
                 speak("Tell me the name of your file you want to send")
-                file_name=take_command(source).lower()
+                name_of_file=take_command(source).lower()
                 speak("Can you give me the email of the receiver")
                 address=input("Enter the email:")
-                result=find_and_send_file_via_gmail(r"C:\Users\omshelke\Desktop\Om Shelke",file_name,
+                result=find_and_send_file_via_gmail(r"C:\Users\omshelke\Desktop\Om Shelke",name_of_file,
                                                     sender,password,address)
 
                 if result==0:
@@ -256,22 +257,22 @@ with sr.Microphone() as source:
 
             elif "search" in text:
                 speak("Tell me what you want to search on Wikipedia")
-                query = take_command(source)
-                if query:
-                    wiki(query)
+                qry = take_command(source)
+                if qry:
+                    wiki(qry)
 
             elif "email" in text:
                 speak("what is the email ID of the person you want to send the email to?")
                 destination = input("Email ID:").strip()
 
                 speak("give me the message:")
-                message = take_command(source)
+                ms = take_command(source)
 
-                if not message:
+                if not ms:
                     speak("I could not hear the message")
                     continue
 
-                result = send_email(destination, message)
+                result = send_email(destination, ms)
 
                 if result:
                     speak("Your email is sent successfully")
